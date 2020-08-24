@@ -11,15 +11,15 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/primes", handler)
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	primespiral(w)
+	primespiral(w, 5000)
 }
 
-func primespiral(out io.Writer) {
+func primespiral(out io.Writer, max int) {
 	const (
 		size = 1000
 	)
@@ -32,8 +32,8 @@ func primespiral(out io.Writer) {
 	for p < 100000 {
 			r := float64(p)
 		    theta := float64(p)
-			x := size + r * math.Sin(theta) / 100.0
-			y := size + r  * math.Cos(theta) / 100.0
+			x := size + r * math.Sin(theta) * float64(size) / float64(max)
+			y := size + r  * math.Cos(theta) * float64(size) / float64(max)
 			dc.DrawCircle(x, y, 3)
 			dc.SetRGB(0, 0, 0)
 			dc.Fill()
