@@ -17,20 +17,12 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	max, ok := r.URL.Query()["max"]
-	if (ok && len(max) > 0) {
-		maxStr := max[0]
-		m, err := strconv.Atoi(maxStr)
-		if err != nil {
-			primespiral(w, 10000)
-		}
-		primespiral(w, m)
-	} else {
-		primespiral(w, 10000)
-	}
+	max := getQueryParameter(r, "max", 10000)
+	pointSize := getQueryParameter(r, "pointsize", 5)
+	primespiral(w, max, pointSize)
 }
 
-func primespiral(out io.Writer, max int) {
+func primespiral(out io.Writer, max, pointSize int) {
 	const (
 		size = 1000
 	)
@@ -45,11 +37,26 @@ func primespiral(out io.Writer, max int) {
 		    theta := float64(p)
 			x := size + r * math.Sin(theta) * float64(size) / float64(max)
 			y := size + r  * math.Cos(theta) * float64(size) / float64(max)
-			dc.DrawCircle(x, y, 3)
+			dc.DrawCircle(x, y, float64(pointSize))
 			dc.SetRGB(0, 0, 0)
 			dc.Fill()
 			p = g.Next()
 	}
 	img := dc.Image()
 	png.Encode(out, img)
+}
+
+func getQueryParameter( r *http.Request, name string, defaultValue int) int {
+	q, ok := r.URL.Query()[name]
+	if ok && len(q) > 0 {
+		s := q[0]
+		i, err := strconv.Atoi(s)
+		if err != nil {
+			return defaultValue
+		} else {
+			return i
+		}
+	} else {
+		return defaultValue
+	}
 }
