@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 )
 
 func main() {
@@ -16,7 +17,17 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	primespiral(w, 5000)
+	max, ok := r.URL.Query()["max"]
+	if (ok && len(max) > 0) {
+		maxStr := max[0]
+		m, err := strconv.Atoi(maxStr)
+		if err != nil {
+			primespiral(w, 10000)
+		}
+		primespiral(w, m)
+	} else {
+		primespiral(w, 10000)
+	}
 }
 
 func primespiral(out io.Writer, max int) {
